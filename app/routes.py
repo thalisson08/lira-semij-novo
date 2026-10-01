@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, request
+import os
+
+from flask import Blueprint, current_app, jsonify, request, send_from_directory
 
 from app.store import produtos, proximo_id
 
@@ -73,6 +75,12 @@ def validar_produto(dados, parcial=False):
         return "O campo 'ativo' deve ser booleano."
 
     return None
+
+
+@api.get("/")
+def pagina_inicial():
+    pasta = os.path.join(current_app.root_path, "web")
+    return send_from_directory(pasta, "index.html")
 
 
 @api.get("/health")
