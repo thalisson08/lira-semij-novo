@@ -1,0 +1,37 @@
+stages:
+  - build
+  - test
+  - lint
+
+default:
+  image: python:3.12-slim
+  before_script:
+    - python --version
+    - pip install --upgrade pip
+    - pip install -r requirements-dev.txt
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+build:
+  stage: build
+  script:
+    - python -m compileall app run.py
+    - mkdir -p dist
+    - python -c "import shutil; shutil.make_archive('dist/lira-semijoias-api', 'zip', root_dir='app')"
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - python -m pytest -v
+
+lint:
+  stage: lint
+  script:
+    - flake8 app tests run.py

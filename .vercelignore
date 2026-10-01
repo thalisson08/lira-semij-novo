@@ -1,0 +1,14 @@
+tests/
+aws/
+Dockerfile
+docker-compose.yml
+.gitlab-ci.yml
+.flake8
+pytest.ini
+requirements-dev.txt
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+dist/
+.env

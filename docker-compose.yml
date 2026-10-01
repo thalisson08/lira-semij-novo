@@ -1,0 +1,32 @@
+services:
+  api:
+    build: .
+    container_name: lira-api
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-lira}:${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}@db:5432/${POSTGRES_DB:-lira_semijoias}
+      PORT: "5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: lira-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-lira}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: ${POSTGRES_DB:-lira_semijoias}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
